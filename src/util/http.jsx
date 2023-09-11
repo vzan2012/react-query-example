@@ -1,4 +1,32 @@
+/**
+ * Events URL from Backend
+ *
+ * @type {string}
+ */
 let url = `http://localhost:3000/events`;
+
+/**
+ * Custom Error
+ *
+ * @async
+ * @param {string} title
+ * @param {*} response
+ * @returns {error}
+ */
+export const customError = async (title, response) => {
+  const error = new Error(title);
+  error.code = response.status;
+  error.info = await response.json();
+  throw error;
+};
+
+/**
+ * FetchEvents - GET Request
+ *
+ * @async
+ * @param {{ signal: any; searchTerm: string; }} { signal, searchTerm }
+ * @returns {events}
+ */
 export const fetchEvents = async ({ signal, searchTerm }) => {
   console.log(searchTerm);
 
@@ -9,10 +37,7 @@ export const fetchEvents = async ({ signal, searchTerm }) => {
   });
 
   if (!response.ok) {
-    const error = new Error("An error occurred while fetching the events");
-    error.code = response.status;
-    error.info = await response.json();
-    throw error;
+    await customError("An error occurred while fetching the events", response);
   }
 
   const { events } = await response.json();
@@ -20,6 +45,13 @@ export const fetchEvents = async ({ signal, searchTerm }) => {
   return events;
 };
 
+/**
+ * Create New Event - POST Request
+ *
+ * @async
+ * @param {*} eventData
+ * @returns {event}
+ */
 export const createNewEvent = async (eventData) => {
   const response = await fetch(url, {
     method: "POST",
@@ -30,12 +62,28 @@ export const createNewEvent = async (eventData) => {
   });
 
   if (!response.ok) {
-    const error = new Error("An error occured while creating the event");
-    error.code = response.status;
-    error.info = await response.json();
-    throw error;
+    await customError("An error occured while creating the event", response);
   }
   const { event } = await response.json();
 
   return event;
+};
+
+/**
+ * Fetch Selectable Images
+ *
+ * @async
+ * @param {{ signal: any; }} { signal }
+ * @returns {unknown}
+ */
+export const fetchSelectableImages = async ({ signal }) => {
+  const response = await fetch(`${url}/images`, { signal });
+
+  if (!response.ok) {
+    await customError("An error occured while fetching the images", response);
+  }
+
+  const { images } = await response.json();
+
+  return images;
 };
