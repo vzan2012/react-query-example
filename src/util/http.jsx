@@ -1,9 +1,13 @@
+import { QueryClient } from "@tanstack/react-query";
+
 /**
  * Events URL from Backend
  *
  * @type {string}
  */
 let url = `http://localhost:3000/events`;
+
+export const queryClient = new QueryClient();
 
 /**
  * Custom Error
