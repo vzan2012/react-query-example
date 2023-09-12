@@ -129,3 +129,24 @@ export const deleteEvent = async ({ id }) => {
 
   return response.json();
 };
+
+/**
+ * Update an event
+ *
+ * @async
+ * @param {{ id: any; event: any; }} { id, event }
+ * @returns {unknown}
+ */
+export const updateEvent = async ({ id, event }) => {
+  const response = await fetch(`${url}/${id}`, {
+    method: "PUT",
+    body: JSON.stringify({ event }),
+    headers: { "Content-Type": "application/json" },
+  });
+
+  if (!response.ok) {
+    await customError("An error occured while updating the event", response);
+  }
+
+  return response.json();
+};
