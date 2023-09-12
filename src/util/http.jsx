@@ -78,7 +78,7 @@ export const createNewEvent = async (eventData) => {
  *
  * @async
  * @param {{ signal: any; }} { signal }
- * @returns {unknown}
+ * @returns {images}
  */
 export const fetchSelectableImages = async ({ signal }) => {
   const response = await fetch(`${url}/images`, { signal });
@@ -90,4 +90,42 @@ export const fetchSelectableImages = async ({ signal }) => {
   const { images } = await response.json();
 
   return images;
+};
+
+/**
+ * Fetch an event by ID
+ *
+ * @async
+ * @param {{ id: any; signal: any; }} { id, signal }
+ * @returns {event}
+ */
+export const fetchEvent = async ({ id, signal }) => {
+  const response = await fetch(`${url}/${id}`, { signal });
+
+  if (!response.ok) {
+    await customError("An error occured while fetching the event", response);
+  }
+
+  const { event } = await response.json();
+
+  return event;
+};
+
+/**
+ * Delete an event by Id
+ *
+ * @async
+ * @param {{ id: any; }} { id }
+ * @returns {unknown}
+ */
+export const deleteEvent = async ({ id }) => {
+  const response = await fetch(`${url}/${id}`, {
+    method: "DELETE",
+  });
+
+  if (!response.ok) {
+    await customError("An error occured while deleting the event", response);
+  }
+
+  return response.json();
 };
