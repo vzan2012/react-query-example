@@ -2,8 +2,8 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 
 import Modal from "../UI/Modal.jsx";
 import EventForm from "./EventForm.jsx";
-import { useQuery } from "@tanstack/react-query";
-import { fetchEvent } from "../../util/http.jsx";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { fetchEvent, queryClient, updateEvent } from "../../util/http.jsx";
 import LoadingIndicator from "../UI/LoadingIndicator.jsx";
 import ErrorBlock from "../UI/ErrorBlock.jsx";
 
@@ -16,7 +16,32 @@ export default function EditEvent() {
     queryFn: ({ signal }) => fetchEvent({ id: params.id, signal }),
   });
 
-  function handleSubmit(formData) {}
+  const { mutate } = useMutation({
+    mutationFn: updateEvent,
+    onMutate: async (data) => {
+      const newEvent = data.event;
+
+      // Cancel Queries
+      await queryClient.cancelQueries(["events", params.id]);
+
+      // Get Previous Stored Event
+      const previousEvent = queryClient.getQueryData(["events", params.id]);
+
+      // Set query data
+      queryClient.setQueryData(["events", params.id], newEvent);
+
+      return { previousEvent };
+    },
+    onError: (error, data, context) => {
+      queryClient.setQueryData(["events", params.id], context.previousEvent);
+    },
+    onSettled: () => queryClient.invalidateQueries(["events", params.id]),
+  });
+
+  function handleSubmit(formData) {
+    mutate({ id: params.id, event: formData });
+    navigate("../");
+  }
 
   function handleClose() {
     navigate("../");
