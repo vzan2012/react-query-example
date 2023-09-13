@@ -31,10 +31,16 @@ export const customError = async (title, response) => {
  * @param {{ signal: any; searchTerm: string; }} { signal, searchTerm }
  * @returns {events}
  */
-export const fetchEvents = async ({ signal, searchTerm }) => {
+export const fetchEvents = async ({ signal, searchTerm, max }) => {
   console.log(searchTerm);
 
-  if (searchTerm) url += `?search=${searchTerm}`;
+  if (searchTerm && max) {
+    url += `?search=${searchTerm}&max=${max}`;
+  } else if (searchTerm) {
+    url += `?search=${searchTerm}`;
+  } else if (max) {
+    url += `?max=${max}`;
+  }
 
   const response = await fetch(url, {
     signal,
